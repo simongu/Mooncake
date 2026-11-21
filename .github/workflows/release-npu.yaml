@@ -19,7 +19,7 @@ jobs:
       max-parallel: 1
       matrix:
         arch: [aarch64]
-        python-version: ['3.11']
+        python-version: ['3.12']
         include:
           - arch: aarch64
             runner: ubuntu-22.04-arm
