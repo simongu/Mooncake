@@ -16,17 +16,14 @@ jobs:
     if: ${{ (github.event_name == 'push' && !contains(github.ref_name, '-')) || (github.event_name == 'workflow_dispatch' && startsWith(inputs.tag, 'v') && !contains(inputs.tag, '-')) }}
 
     strategy:
-      max-parallel: 2
+      max-parallel: 1
       matrix:
-        arch: [aarch64, x86_64]
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        arch: [aarch64]
+        python-version: ['3.11']
         include:
           - arch: aarch64
             runner: ubuntu-22.04-arm
             cann_arch: aarch64
-          - arch: x86_64
-            runner: ubuntu-22.04
-            cann_arch: x86_64
 
     runs-on: ${{ matrix.runner }}
 
