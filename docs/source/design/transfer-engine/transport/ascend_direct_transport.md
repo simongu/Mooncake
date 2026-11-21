@@ -58,9 +58,35 @@ The following environment variables can be configured to control Ascend Direct T
 | `ASCEND_USE_SHORT_CONNECTION` | Enable short connection mode (disconnect after each transfer) | 0 (disabled) | `ASCEND_USE_SHORT_CONNECTION=1` |
 | `ASCEND_BUFFER_POOL` | Buffer pool configuration for intermediate transfer mode (BUFFER_NUM:BUFFER_SIZE_MB) | "0:0" (disabled) | `ASCEND_BUFFER_POOL=4:8` |
 | `ASCEND_BASE_PORT` | Base port for ADXL engine port allocation | 20000 | `ASCEND_BASE_PORT=20000` |
+| `MC_ASCEND_AGENT_MODE` / `ASCEND_AGENT_MODE` | Store clients self-manage the ACL device context and split mounted capacity across local NPUs; only affects `protocol=ascend`. The C++ standalone store binary enables this automatically; set it for embedded store clients that have no runtime context (e.g. the Python `mc_store_rest_server`) | 0 (disabled) | `MC_ASCEND_AGENT_MODE=1` |
 | `HCCL_INTRA_ROCE_ENABLE` | Enable RDMA protocol for intra-node communication | 0 (disabled) | `HCCL_INTRA_ROCE_ENABLE=1` |
 | `HCCL_RDMA_TIMEOUT` | RDMA packet retransmission timeout coefficient | - | `HCCL_RDMA_TIMEOUT=14` |
 | `HCCL_RDMA_RETRY_CNT` | RDMA packet retransmission count | - | `HCCL_RDMA_RETRY_CNT=7` |
+=======
+In the table below, variables supported by **both Classic TE and TENT** are listed first as primary options, followed by CANN/HCCL native variables and Classic-TE-only / deprecated options.
+
+| Variable | Description | Default Value | TENT Support | Example |
+|----------|-------------|---------------|--------------|---------|
+| `MC_ASCEND_TRANSFER_TIMEOUT` / `ASCEND_TRANSFER_TIMEOUT` | Data transfer timeout in milliseconds | 10000 | Supported, auto-converted to `transports/ascend_direct/transfer_timeout_ms` config | `MC_ASCEND_TRANSFER_TIMEOUT=10000` |
+| `MC_ASCEND_THREAD_POOL_SIZE` / `ASCEND_THREAD_POOL_SIZE` | Number of worker threads in the transfer thread pool (1–32) | 16 (1 for buffer pool mode) | Supported, auto-converted to `transports/ascend_direct/thread_pool_size` config | `MC_ASCEND_THREAD_POOL_SIZE=32` |
+| `MC_ASCEND_BASE_PORT` / `ASCEND_BASE_PORT` | Base port for ADXL/HIXL engine port allocation | 20000 | Supported, auto-converted to `transports/ascend_direct/base_port` config | `MC_ASCEND_BASE_PORT=20000` |
+| `MC_ASCEND_ENABLE_USE_FABRIC_MEM` / `ASCEND_ENABLE_USE_FABRIC_MEM` | Enable fabric memory transfer mode in Mooncake Store (A3 only) | 0 (disabled) | Supported (Store TE only), auto-converted to `transports/ascend_direct/fabric_mem` config | `MC_ASCEND_ENABLE_USE_FABRIC_MEM=1` |
+| `MC_ASCEND_GLOBAL_RESOURCE_CONFIG` / `ASCEND_GLOBAL_RESOURCE_CONFIG` | Global resource configuration | - | Supported, auto-converted to `transports/ascend_direct/global_resource_config` config | `MC_ASCEND_GLOBAL_RESOURCE_CONFIG='{"comm_resource_config":{"protocol_desc":"roce:device"}}'` |
+| `MC_ASCEND_RDMA_TC` / `ASCEND_RDMA_TC` | RDMA Traffic Class (falls back to `HCCL_RDMA_TC`) | - | Supported, auto-converted to `transports/ascend_direct/rdma_tc` config | `MC_ASCEND_RDMA_TC=106` |
+| `MC_ASCEND_RDMA_SL` / `ASCEND_RDMA_SL` | RDMA Service Level (falls back to `HCCL_RDMA_SL`) | - | Supported, auto-converted to `transports/ascend_direct/rdma_sl` config | `MC_ASCEND_RDMA_SL=3` |
+| `MC_ASCEND_LOCAL_COMM_RES` / `ASCEND_LOCAL_COMM_RES` | HIXL local communication resource JSON (`LocalCommRes`) | `{"version":"1.3"}` (in CS/TENT mode) | Supported, auto-converted to `transports/ascend_direct/local_comm_res` config | `MC_ASCEND_LOCAL_COMM_RES='{"version":"1.3"}'` |
+| `MC_ASCEND_USE_SHMEM` / `ASCEND_USE_SHMEM` | Enable same-host shared memfd fast path for host buffers | 0 (disabled) | Supported, auto-converted to `transports/ascend_direct/use_shmem` config | `MC_ASCEND_USE_SHMEM=1` |
+| `MC_ASCEND_STANDALONE_SINGLE_SEGMENT` / `ASCEND_STANDALONE_SINGLE_SEGMENT` | Share one Store segment across NPUs to reduce connections | 0 (disabled) | Supported, auto-converted to `transports/ascend_direct/standalone_single_segment` config | `MC_ASCEND_STANDALONE_SINGLE_SEGMENT=1` |
+| `MC_ASCEND_AGENT_MODE` / `ASCEND_AGENT_MODE` | Store clients self-manage the ACL device context and split mounted capacity across local NPUs; only affects `protocol=ascend`. The C++ standalone store binary enables this automatically; set it for embedded store clients that have no runtime context (e.g. the Python `mc_store_rest_server`) | 0 (disabled) | Not a TENT config key (TE-level flag) | `MC_ASCEND_AGENT_MODE=1` |
+| `MC_CUSTOM_TOPO_JSON` | Path to NIC topology JSON for `comm_resource_config.nic_topo_path` | - | Supported, auto-converted to `topology/custom_json_path` config | `MC_CUSTOM_TOPO_JSON=/etc/mooncake/nic_topo.json` |
+| `HCCL_RDMA_TIMEOUT` | RDMA packet retransmission timeout coefficient | - | CANN/HCCL native | `HCCL_RDMA_TIMEOUT=14` |
+| `HCCL_RDMA_RETRY_CNT` | RDMA packet retransmission count | - | CANN/HCCL native | `HCCL_RDMA_RETRY_CNT=7` |
+| `MC_ASCEND_AUTO_CONNECT` / `ASCEND_AUTO_CONNECT` | Enable automatic connection management | 1 (enabled) | Enabled by default, no need to specify | `MC_ASCEND_AUTO_CONNECT=0` |
+| `MC_ASCEND_USE_ASYNC_TRANSFER` / `ASCEND_USE_ASYNC_TRANSFER` | Enable asynchronous transfer mode | 0 (disabled) | Async enabled by default, no need to specify | `MC_ASCEND_USE_ASYNC_TRANSFER=1` |
+| `MC_ASCEND_CONNECT_TIMEOUT` / `ASCEND_CONNECT_TIMEOUT` | Link establishment timeout in milliseconds | 10000 | Uses AutoConnect by default, no need to specify | `MC_ASCEND_CONNECT_TIMEOUT=5000` |
+| `MC_ASCEND_USE_SHORT_CONNECTION` / `ASCEND_USE_SHORT_CONNECTION` | Enable short connection mode (disconnect after each transfer) | 0 (disabled) | Not supported | `MC_ASCEND_USE_SHORT_CONNECTION=1` |
+| `MC_ASCEND_BUFFER_POOL` / `ASCEND_BUFFER_POOL` *(Deprecated)* | Buffer pool configuration for intermediate transfer mode (`BUFFER_NUM:BUFFER_SIZE_MB`) | `"0:0"` (disabled) | Not supported | `MC_ASCEND_BUFFER_POOL=4:8` |
+| `HCCL_INTRA_ROCE_ENABLE` *(Deprecated)* | Enable intra-node RDMA protocol when not using `hixl_cs` before CANN 9.2 | 0 (disabled) | Fallback detection only | `HCCL_INTRA_ROCE_ENABLE=1` |
 
 **Detailed Descriptions:**
 
